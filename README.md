@@ -93,7 +93,7 @@ Docker>Commands:buildを選択してビルド設定を修正する。(settings.j
 この編集によりこんなコマンドが生成されることになる。
 
 ```
-docker build --pull --rm --network host -f ./Dockerfile -t nodejsdocker:latest
+docker build --pull --rm --network host -f ./Dockerfile -t node20:latest
 ```
 
 これはDocker内でapt-getコマンドなどのインターネットをアクセスするコマンドがホスト名を解決できない問題を解消する一つの手段である。
@@ -104,7 +104,7 @@ docker build --pull --rm --network host -f ./Dockerfile -t nodejsdocker:latest
 
 ![](./assets/run_build.png)
 
-プロンプトが表示されるので生成したいイメージの名前を入力してエンターキーを押す。
+プロンプトが表示されるので生成したいイメージの名前を入力してエンターキーを押す。（イメージ名はnode20など）
 
 ![](./assets/build_image_prompt.png)
 
@@ -113,3 +113,59 @@ docker build --pull --rm --network host -f ./Dockerfile -t nodejsdocker:latest
 ビルドが正常に終了するとDockerのイメージが生成されたことが確認できる。
 
 ![](./assets/build_image.png)
+
+## Docker Hubへの登録
+
+生成されたイメージの名前を調べる。
+
+```
+$ docker images
+REPOSITORY               TAG       IMAGE ID       CREATED        SIZE
+node20                   latest    7e42cf7db7a7   22 hours ago   895MB
+...
+```
+
+Hubに登録するタブを関連付ける
+
+```
+docker tag node20 自分のDockerユーザID/node20:latest
+```
+
+このようになる。
+
+```
+$ docker images
+REPOSITORY               TAG       IMAGE ID       CREATED        SIZE
+DockerユーザID/node20    latest    7e42cf7db7a7   22 hours ago   895MB
+node20                   latest    7e42cf7db7a7   22 hours ago   895MB
+...
+```
+
+DockerにログインしてPushする。
+
+```
+$ docker login
+Log in with your Docker ID or email address to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com/ to create one.
+You can log in with your password or a Personal Access Token (PAT). Using a limited-scope PAT grants better security and is required for organizations using SSO. Learn more at https://docs.docker.com/go/access-tokens/
+
+Username: DockerユーザID
+Password: パスワード
+WARNING! Your password will be stored unencrypted in /home/ktsubaki/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+$ docker push kazz12211/node20:latest
+```
+
+Docker Hubでイメージが登録されたことを確認する。
+
+![](./assets/dockerhub.png)
+
+
+これでいつでも
+```
+docker pull DockerユーザID/node20
+```
+とすればイメージを利用できる。開発したアプリケーションや実行環境を配布するときに大変便利。
